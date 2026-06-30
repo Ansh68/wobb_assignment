@@ -1,32 +1,24 @@
+import { memo } from "react";
+import { SearchX } from "lucide-react";
+import { ProfileCard } from "@/components/ProfileCard";
 import type { Platform, UserProfileSummary } from "@/types";
-import { ProfileCard } from "./ProfileCard";
 
 interface ProfileListProps {
   profiles: UserProfileSummary[];
   platform: Platform;
-  onProfileClick: (username: string) => void;
 }
 
-export function ProfileList({ profiles, platform, onProfileClick }: ProfileListProps) {
+
+export const ProfileList = memo(function ProfileList({
+  profiles,
+  platform,
+}: ProfileListProps) {
   if (profiles.length === 0) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 16,
-          padding: "80px 0",
-          textAlign: "center",
-          animation: "fadeInUp 0.4s ease",
-        }}
-      >
-        <div style={{ fontSize: 52 }}>🔍</div>
-        <h3 style={{ fontSize: 18, fontWeight: 600, color: "var(--text-heading)", margin: 0 }}>
-          No influencers found
-        </h3>
-        <p style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 280 }}>
+      <div className="profile-list-empty" role="status" aria-live="polite">
+        <SearchX size={48} color="var(--text-muted)" />
+        <h3 className="profile-list-empty-title">No influencers found</h3>
+        <p className="profile-list-empty-desc">
           Try a different search term or switch to another platform.
         </p>
       </div>
@@ -34,22 +26,15 @@ export function ProfileList({ profiles, platform, onProfileClick }: ProfileListP
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 520px), 1fr))",
-        gap: 12,
-      }}
-    >
+    <div className="profile-grid">
       {profiles.map((profile, idx) => (
         <ProfileCard
           key={profile.user_id}
           profile={profile}
           platform={platform}
-          onProfileClick={onProfileClick}
           animationDelay={idx * 40}
         />
       ))}
     </div>
   );
-}
+});

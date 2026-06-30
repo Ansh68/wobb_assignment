@@ -91,10 +91,20 @@ Features:
 ## Libraries Added
 
 | Library | Version | Purpose |
-|---------|---------|---------|
+|---------|---------|------|
 | `zustand` | `^5.x` | Global state management (selected list + persistence) |
+| `lucide-react` | `^0.x` | Icon library — replaces all inline SVGs and emoji icons |
+| `react-hot-toast` | `^2.x` | Toast notifications for Add/Remove list feedback |
+| `clsx` | `^2.x` | Conditional CSS class merging utility |
+| `@radix-ui/react-tooltip` | `^1.x` | Accessible tooltip primitives (via TooltipProvider in App) |
 
-> `react-beautiful-dnd` was already installed; `reorderProfiles` in the store is wired for future drag-to-reorder in the panel.
+---
+
+## Code Splitting & Performance
+
+- **Lazy Loading** — Routes are implemented via `React.lazy()` and `Suspense` to reduce initial bundle size.
+- **Data Fetching** — Used `import.meta.glob` for efficient static JSON loading; files are only read/parsed when the specific profile is requested.
+- **Memoization** — Intensive filter calculations are wrapped in `useMemo`, and child list components are wrapped in `React.memo` to prevent unnecessary re-renders during high-frequency search typing.
 
 ---
 

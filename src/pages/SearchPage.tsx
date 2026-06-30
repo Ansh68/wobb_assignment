@@ -9,10 +9,10 @@ export function SearchPage() {
   const [platform, setPlatform] = useState<Platform>("instagram");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Memoized: only recompute when platform changes
+  // Memoized: recomputed only when platform changes
   const allProfiles = useMemo(() => extractProfiles(platform), [platform]);
 
-  // Memoized: only recompute when profiles list or query changes
+  // Memoized: recomputed only when the list or query changes
   const filteredProfiles = useMemo(
     () => filterProfiles(allProfiles, searchQuery),
     [allProfiles, searchQuery]
@@ -20,31 +20,19 @@ export function SearchPage() {
 
   const handlePlatformChange = useCallback((p: Platform) => {
     setPlatform(p);
-    setSearchQuery(""); // reset search on platform switch
+    setSearchQuery(""); // clear search on platform switch
   }, []);
 
   const handleSearchChange = useCallback((q: string) => {
     setSearchQuery(q);
   }, []);
 
-  // No-op: navigation is handled inside ProfileCard itself
-  const handleProfileClick = useCallback(() => {}, []);
-
   return (
     <Layout title="Find Influencers">
-      {/* Subtitle */}
-      <p
-        style={{
-          fontSize: 15,
-          color: "var(--text-secondary)",
-          marginBottom: 32,
-          marginTop: 8,
-        }}
-      >
+      <p className="page-subtitle">
         Browse top creators across Instagram, YouTube, and TikTok
       </p>
 
-      {/* Filters */}
       <PlatformFilter
         selected={platform}
         onChange={handlePlatformChange}
@@ -52,28 +40,13 @@ export function SearchPage() {
         onSearchChange={handleSearchChange}
       />
 
-      {/* Results count */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 16,
-        }}
-      >
-        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
-          {searchQuery
-            ? `${filteredProfiles.length} of ${allProfiles.length} results`
-            : `${allProfiles.length} influencers`}
-        </p>
-      </div>
+      <p className="results-count" aria-live="polite">
+        {searchQuery
+          ? `${filteredProfiles.length} of ${allProfiles.length} results`
+          : `${allProfiles.length} influencers`}
+      </p>
 
-      {/* Profile grid */}
-      <ProfileList
-        profiles={filteredProfiles}
-        platform={platform}
-        onProfileClick={handleProfileClick}
-      />
+      <ProfileList profiles={filteredProfiles} platform={platform} />
     </Layout>
   );
 }

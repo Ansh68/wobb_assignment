@@ -1,5 +1,7 @@
+import { Search, X } from "lucide-react";
 import type { Platform } from "@/types";
-import { PLATFORMS, getPlatformLabel } from "@/utils/dataHelpers";
+import { PLATFORMS } from "@/utils/dataHelpers";
+import { PLATFORM_META } from "@/constants/platform";
 
 interface PlatformFilterProps {
   selected: Platform;
@@ -8,12 +10,6 @@ interface PlatformFilterProps {
   onSearchChange: (value: string) => void;
 }
 
-const PLATFORM_META: Record<Platform, { emoji: string; color: string; dimColor: string }> = {
-  instagram: { emoji: "📸", color: "#e1306c", dimColor: "rgba(225,48,108,0.15)" },
-  youtube:   { emoji: "▶️", color: "#ff4444", dimColor: "rgba(255,68,68,0.15)" },
-  tiktok:    { emoji: "🎵", color: "#69c9d0", dimColor: "rgba(105,201,208,0.15)" },
-};
-
 export function PlatformFilter({
   selected,
   onChange,
@@ -21,131 +17,94 @@ export function PlatformFilter({
   onSearchChange,
 }: PlatformFilterProps) {
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div className="platform-filter">
       {/* Platform pills */}
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          flexWrap: "wrap",
-          marginBottom: 20,
-        }}
-      >
+      <div className="platform-pills" role="tablist" aria-label="Filter by platform">
         {PLATFORMS.map((p) => {
-          const isSelected = selected === p;
+          const isActive = selected === p;
           const meta = PLATFORM_META[p];
           return (
             <button
               key={p}
               id={`platform-tab-${p}`}
               type="button"
+              role="tab"
               onClick={() => onChange(p)}
-              aria-pressed={isSelected}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "10px 20px",
-                borderRadius: "var(--radius-full)",
-                border: isSelected
-                  ? `1px solid ${meta.color}60`
-                  : "1px solid var(--border)",
-                background: isSelected ? meta.dimColor : "var(--bg-elevated)",
-                color: isSelected ? meta.color : "var(--text-secondary)",
-                fontWeight: 600,
-                fontSize: 14,
-                cursor: "pointer",
-                transition: "all var(--transition)",
-                fontFamily: "var(--font-sans)",
-                boxShadow: isSelected ? `0 0 16px ${meta.color}20` : "none",
-                transform: isSelected ? "translateY(-1px)" : "none",
-              }}
+              aria-pressed={isActive}
+              aria-selected={isActive}
+              className={`platform-pill ${isActive ? "platform-pill--active" : ""}`}
+              style={
+                isActive
+                  ? {
+                    color: meta.color,
+                    background: meta.dimBg,
+                    borderColor: meta.borderColor,
+                    boxShadow: `0 0 16px ${meta.color}20`,
+                  }
+                  : {}
+              }
             >
-              <span style={{ fontSize: 16 }}>{meta.emoji}</span>
-              {getPlatformLabel(p)}
+              {p === "instagram" && <InstagramIcon />}
+              {p === "youtube" && <YoutubeIcon />}
+              {p === "tiktok" && <TiktokIcon />}
+              {meta.label}
             </button>
           );
         })}
       </div>
 
       {/* Search input */}
-      <div style={{ position: "relative", maxWidth: 480 }}>
-        {/* Search icon */}
-        <div
-          style={{
-            position: "absolute",
-            left: 14,
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: "var(--text-muted)",
-            display: "flex",
-            alignItems: "center",
-            pointerEvents: "none",
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
-        </div>
-
+      <div className="search-input-wrapper">
+        <Search
+          size={15}
+          className="search-input-icon"
+          aria-hidden="true"
+        />
         <input
           id="influencer-search-input"
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search by username or name..."
+          placeholder="Search by username or name…"
           aria-label="Search influencers"
-          style={{
-            width: "100%",
-            padding: "12px 40px 12px 42px",
-            background: "var(--bg-elevated)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-md)",
-            color: "var(--text-primary)",
-            fontSize: 14,
-            fontFamily: "var(--font-sans)",
-            outline: "none",
-            transition: "all var(--transition)",
-          }}
-          onFocus={(e) => {
-            e.target.style.borderColor = "var(--border-accent)";
-            e.target.style.boxShadow = "0 0 0 3px var(--accent-dim)";
-          }}
-          onBlur={(e) => {
-            e.target.style.borderColor = "var(--border)";
-            e.target.style.boxShadow = "none";
-          }}
+          className="search-input"
         />
-
-        {/* Clear button */}
         {searchQuery && (
           <button
             onClick={() => onSearchChange("")}
             aria-label="Clear search"
-            style={{
-              position: "absolute",
-              right: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 22,
-              height: 22,
-              borderRadius: "var(--radius-full)",
-              border: "none",
-              background: "var(--text-muted)",
-              color: "var(--bg-base)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 700,
-            }}
+            className="search-clear-btn"
           >
-            ✕
+            <X size={12} />
           </button>
         )}
       </div>
     </div>
+  );
+}
+
+
+
+function InstagramIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+    </svg>
+  );
+}
+
+function YoutubeIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+    </svg>
+  );
+}
+
+function TiktokIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.53V6.77a4.85 4.85 0 01-1.02-.08z" />
+    </svg>
   );
 }
