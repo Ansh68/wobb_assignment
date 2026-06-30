@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import type { Platform } from "@/types";
 import { Layout } from "@/components/Layout";
 import { PlatformFilter } from "@/components/PlatformFilter";
@@ -8,40 +8,70 @@ import { extractProfiles, filterProfiles } from "@/utils/dataHelpers";
 export function SearchPage() {
   const [platform, setPlatform] = useState<Platform>("instagram");
   const [searchQuery, setSearchQuery] = useState("");
-  const [clickCount, setClickCount] = useState(0);
 
-  const allProfiles = extractProfiles(platform);
-  const filtered = filterProfiles(allProfiles, searchQuery);
+  // Memoized: only recompute when platform changes
+  const allProfiles = useMemo(() => extractProfiles(platform), [platform]);
 
-  const handleProfileClick = (username: string) => {
-    setClickCount(clickCount + 1);
-    console.log("Clicked profile:", username, "total clicks:", clickCount);
-  };
+  // Memoized: only recompute when profiles list or query changes
+  const filteredProfiles = useMemo(
+    () => filterProfiles(allProfiles, searchQuery),
+    [allProfiles, searchQuery]
+  );
+
+  const handlePlatformChange = useCallback((p: Platform) => {
+    setPlatform(p);
+    setSearchQuery(""); // reset search on platform switch
+  }, []);
+
+  const handleSearchChange = useCallback((q: string) => {
+    setSearchQuery(q);
+  }, []);
+
+  // No-op: navigation is handled inside ProfileCard itself
+  const handleProfileClick = useCallback(() => {}, []);
 
   return (
     <Layout title="Find Influencers">
-      <p className="text-gray-500 mb-4 text-sm">
-        Browse top creators across social platforms
+      {/* Subtitle */}
+      <p
+        style={{
+          fontSize: 15,
+          color: "var(--text-secondary)",
+          marginBottom: 32,
+          marginTop: 8,
+        }}
+      >
+        Browse top creators across Instagram, YouTube, and TikTok
       </p>
 
+      {/* Filters */}
       <PlatformFilter
         selected={platform}
-        onChange={(p) => {
-          setPlatform(p);
-          setSearchQuery("");
-        }}
+        onChange={handlePlatformChange}
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchChange}
       />
 
-      <p className="text-xs text-gray-400 mb-2">
-        Showing {filtered.length} of {allProfiles.length} on {platform}
-      </p>
+      {/* Results count */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 16,
+        }}
+      >
+        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
+          {searchQuery
+            ? `${filteredProfiles.length} of ${allProfiles.length} results`
+            : `${allProfiles.length} influencers`}
+        </p>
+      </div>
 
+      {/* Profile grid */}
       <ProfileList
-        profiles={filtered}
+        profiles={filteredProfiles}
         platform={platform}
-        searchQuery={searchQuery}
         onProfileClick={handleProfileClick}
       />
     </Layout>

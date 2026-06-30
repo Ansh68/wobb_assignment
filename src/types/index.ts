@@ -7,6 +7,7 @@ export interface UserProfileSummary {
   picture: string;
   fullname: string;
   is_verified: boolean;
+  account_type?: number;
   followers: number;
   engagements?: number;
   engagement_rate?: number;
