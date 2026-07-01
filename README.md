@@ -177,7 +177,4 @@ src/
 
 ---
 
-## Submission
 
-- **Repo:** https://github.com/Ansh68/wobb_assignment
-- **Deadline:** 2 July 2026, 2:00 PM IST
