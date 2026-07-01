@@ -4,7 +4,7 @@ A polished influencer discovery platform built with **React 19**, **TypeScript**
 
 ## Live Demo
 
-> _Deploy link (Vercel/Netlify) — add here after deployment_
+> Deployed link (Vercel) — https://wobb-assignment-hdye.vercel.app/
 
 ---
 
@@ -100,7 +100,20 @@ Features:
 
 ---
 
-## Code Splitting & Performance
+## Production / Deployment Notes
+
+### Bug Fixed During Vercel Deployment
+
+**Error:** `npm error ERESOLVE could not resolve react-beautiful-dnd@13.1.1` on Vercel build.
+
+**Root cause:** `react-beautiful-dnd@13.1.1` (from the original starter) does not declare peer dependency support for React 19. Locally, npm resolved it silently, but Vercel's strict install rejected the peer conflict.
+
+**Fix:** Removed `react-beautiful-dnd` entirely from `package.json`. The package was never imported or used anywhere in the codebase — it was a leftover from the starter template.
+
+**Result:** 18 packages removed, install now resolves cleanly on Vercel with zero impact on functionality.
+
+---
+
 
 - **Lazy Loading** — Routes are implemented via `React.lazy()` and `Suspense` to reduce initial bundle size.
 - **Data Fetching** — Used `import.meta.glob` for efficient static JSON loading; files are only read/parsed when the specific profile is requested.
@@ -148,7 +161,6 @@ src/
 - **No real API** — all data is served from static JSON files in `src/assets/data/`. The app works entirely offline after load.
 - **Platform context on Add to List** — when adding a profile from the search page, the currently selected platform tab is stored alongside the profile so the panel can display the correct platform badge.
 - **List persistence** — `localStorage` is used via Zustand persist. This is session-persistent; a real app would sync to a backend.
-- **Drag-to-reorder** — `react-beautiful-dnd` is installed and the `reorderProfiles` store action is implemented, but the panel currently uses a static list. This can be wired up in a future iteration without store changes.
 - **Profile JSON coverage** — only 6 out of 30 influencers have a detailed profile JSON. Clicking the others shows a "not found" state (correct and expected behaviour).
 - **Dark mode only** — the redesign targets dark mode exclusively for a premium feel. Light mode is not implemented.
 
@@ -156,13 +168,12 @@ src/
 
 ## Remaining Improvements (Future Work)
 
-- Add drag-to-reorder in `SelectedListPanel` using the existing `react-beautiful-dnd` dependency
 - Pagination or infinite scroll for larger datasets
 - Unit + integration tests (Vitest + React Testing Library)
-- Deploy to Vercel / Netlify and add live URL
 - Export selected list as CSV
 - Sort / filter influencers by follower count or engagement rate
 - Animated number counters on the profile detail stats
+- Drag-to-reorder in `SelectedListPanel` (store action `reorderProfiles` already implemented, just needs UI wiring)
 
 ---
 
